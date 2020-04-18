@@ -1,5 +1,5 @@
 import os
-from PIL import Image,ImageOps,ImageFilter
+from PIL import Image,ImageOps,ImageFilter,ImageEnhance
 imageTypes = ['.jpg','.png','.jpeg']
 size2to3 = (800,1200)
 def imageManipulation(tag):
@@ -10,17 +10,19 @@ def imageManipulation(tag):
         fileName, extension = os.path.splitext(file)
         if extension in imageTypes:
             # creating a object
-            print(file)
-
             basewidth = 800
             baseheight = 1200
             img = Image.open(file)
             img = ImageOps.mirror(img)
-            img = img.filter(ImageFilter.GaussianBlur(radius=0.5))
+            img = img.filter(ImageFilter.GaussianBlur(radius=0.3))
+            img = ImageEnhance.Brightness(img).enhance(1)
+            img = ImageEnhance.Color(img).enhance(0.7)
             img = img.resize((basewidth, baseheight), Image.ANTIALIAS)
-
-            img.save(f'{fileName}{extension}')
-
+            try:
+                img.save(f'{file}')
+            except Exception as e:
+                img = img.convert('RGB')
+                img.save(f'{file}')
         else:
             os.remove(file)
     os.chdir("..")

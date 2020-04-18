@@ -1,15 +1,10 @@
 from bs4 import BeautifulSoup
 import requests
 import re
-import time
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 import bingscraper as bs
 import os
 from imageManipulation import imageManipulation
-browser = webdriver.Chrome()
-browser.set_window_size(150,150)
-browser.set_window_position(100,100)
+
 imageTypes = ['.jpg','.png','.jpeg']
 def getTag():
     tagList = list()
@@ -28,23 +23,11 @@ def getTag():
 
 
 def search(item):
-    browser.get('https://www.bing.com/images/search?q=a&scope=images&form=QBLH&sp=-1&pq=&sc=0-0&qs=n&sk=&cvid=7E2AA6CD6F924FCFB8CABABF4655BDF7')
-    time.sleep(2)
-    pythonbutton = browser.find_element_by_xpath('//*[@id="sb_form_q"]')
-    pythonbutton.send_keys(Keys.BACKSPACE)
-    pythonbutton.send_keys(item)
-    pythonbutton = browser.find_element_by_xpath('//*[@id="sb_form_go"]')
-    pythonbutton.click()
-    time.sleep(2)
-    pythonbutton = browser.find_element_by_xpath('//*[@id="fltIdtLnk"]')
-    pythonbutton.click()
-    time.sleep(2)
-    pythonbutton = browser.find_element_by_xpath('//*[@id="ftrB"]/ul/li[4]/span')
-    pythonbutton.click()
-    time.sleep(1)
-    pythonbutton = browser.find_element_by_xpath('//*[@id="ftrB"]/ul/li[4]/div/div/a[4]')
-    pythonbutton.click()
-    return browser.current_url
+    query = item
+    query = query.split()
+    query = '+'.join(query)
+    url = f'https://www.bing.com/images/search?&q={query}&qft=+filterui:aspect-tall&FORM=IRFLTR'
+    return url
 
 def download(tag, url):
     bs.scrape(tag).image(url)  # For Image Scraping.
@@ -66,17 +49,16 @@ def directoryOrder(tag):
 
 
 def run(tag):
-    print(f'Aranan tag: {tag}')
     url = search(tag)
-    download(tag, url)
     print(f'Arama indiriliyor: {tag}')
+    download(tag, url)
+    print(f'Isımler degistiriliyor.')
     directoryOrder(tag)
-    print(f'Isımler degistirildi.')
+    print('Resimlerle oynanıyor..')
     imageManipulation(tag)
-    print(f'Resimler ters çevirildi, blur eklendi.')
+    print(f'Resimler ters çevirildi, blur eklendi ve parlaklık arttırıldı.')
 try:
-    run(input('Aranacak tag: '))
+    run(input(': '))
 except Exception as e:
     print(e)
-    browser.close()
 
