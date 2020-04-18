@@ -1,5 +1,5 @@
 import os
-from PIL import Image
+from PIL import Image,ImageOps,ImageFilter
 imageTypes = ['.jpg','.png','.jpeg']
 size2to3 = (800,1200)
 def imageManipulation(tag):
@@ -11,16 +11,16 @@ def imageManipulation(tag):
         if extension in imageTypes:
             # creating a object
             print(file)
-            image = Image.open(file)
-            MAX_SIZE = (100, 100)
 
-            image.resize(MAX_SIZE)
+            basewidth = 800
+            baseheight = 1200
+            img = Image.open(file)
+            img = ImageOps.mirror(img)
+            img = img.filter(ImageFilter.GaussianBlur(radius=0.5))
+            img = img.resize((basewidth, baseheight), Image.ANTIALIAS)
 
-            # creating thumbnail
-            image.save('newONE.jpg')
+            img.save(f'{fileName}{extension}')
 
         else:
             os.remove(file)
     os.chdir("..")
-
-imageManipulation('curated, inspiring ideas')

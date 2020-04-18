@@ -6,9 +6,10 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 import bingscraper as bs
 import os
+from imageManipulation import imageManipulation
 browser = webdriver.Chrome()
 browser.set_window_size(150,150)
-browser.set_window_position(-300,-300)
+browser.set_window_position(100,100)
 imageTypes = ['.jpg','.png','.jpeg']
 def getTag():
     tagList = list()
@@ -28,7 +29,7 @@ def getTag():
 
 def search(item):
     browser.get('https://www.bing.com/images/search?q=a&scope=images&form=QBLH&sp=-1&pq=&sc=0-0&qs=n&sk=&cvid=7E2AA6CD6F924FCFB8CABABF4655BDF7')
-    time.sleep(5)
+    time.sleep(2)
     pythonbutton = browser.find_element_by_xpath('//*[@id="sb_form_q"]')
     pythonbutton.send_keys(Keys.BACKSPACE)
     pythonbutton.send_keys(item)
@@ -40,7 +41,7 @@ def search(item):
     time.sleep(2)
     pythonbutton = browser.find_element_by_xpath('//*[@id="ftrB"]/ul/li[4]/span')
     pythonbutton.click()
-    time.sleep(2)
+    time.sleep(1)
     pythonbutton = browser.find_element_by_xpath('//*[@id="ftrB"]/ul/li[4]/div/div/a[4]')
     pythonbutton.click()
     return browser.current_url
@@ -64,15 +65,17 @@ def directoryOrder(tag):
    os.chdir("..")
 
 
-def run():
-    tagList = getTag()
-    tag = tagList[0]
-    url = search(tagList[0])
+def run(tag):
+    print(f'Aranan tag: {tag}')
+    url = search(tag)
     download(tag, url)
+    print(f'Arama indiriliyor: {tag}')
     directoryOrder(tag)
-    print(os.getcwd())
+    print(f'Isımler degistirildi.')
+    imageManipulation(tag)
+    print(f'Resimler ters çevirildi, blur eklendi.')
 try:
-    run()
+    run(input('Aranacak tag: '))
 except Exception as e:
     print(e)
     browser.close()
