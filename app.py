@@ -3,25 +3,9 @@ import requests
 import re
 import bingscraper as bs
 import os
-from imageManipulation import imageManipulation
-
+from PIL import Image,ImageOps,ImageFilter,ImageEnhance
+import datetime
 imageTypes = ['.jpg','.png','.jpeg']
-def getTag():
-    tagList = list()
-    src = requests.get('https://business.pinterest.com/en/blog/trending-searches-for-april-2020').text
-    soup = BeautifulSoup(src,'lxml')
-    links = soup.findAll('a')
-    for link in links:
-        if link.span is not None:
-            string = f'{link.span.u}'
-
-            setting = re.compile('<.*?>')
-            string = re.sub(setting, '',string)
-            if string != 'None':
-                tagList.append(string)
-    return tagList
-
-
 def search(item):
     query = item
     query = query.split()
@@ -41,24 +25,45 @@ def directoryOrder(tag):
        fileName, extension = os.path.splitext(file)
        if extension in imageTypes:
            i+=1
+           basewidth = 800
+           baseheight = 1200
+           img = Image.open(file)
+           img = ImageOps.mirror(img)
+           img = img.filter(ImageFilter.GaussianBlur(radius=0.3))
+           img = ImageEnhance.Brightness(img).enhance(1)
+           img = ImageEnhance.Color(img).enhance(0.7)
+           img = img.resize((basewidth, baseheight), Image.ANTIALIAS)
+           try:
+               img.save(f'{file}')
+           except Exception as e:
+               img = img.convert('RGB')
+               img.save(f'{file}')
            newName = f'{tag} ({i}).jpg'
-           os.rename(file,newName)
+           os.rename(file, newName)
        else:
            os.remove(file)
    os.chdir("..")
 
-
 def run(tag):
-    url = search(tag)
-    print(f'Arama indiriliyor: {tag}')
-    download(tag, url)
-    print(f'Isımler degistiriliyor.')
-    directoryOrder(tag)
-    print('Resimlerle oynanıyor..')
-    imageManipulation(tag)
-    print(f'Resimler ters çevirildi, blur eklendi ve parlaklık arttırıldı.')
-try:
-    run(input(': '))
-except Exception as e:
-    print(e)
+    if tag is not -1:
+        first = datetime.datetime.today()
+        url = search(tag)
+        download(tag, url)
+        directoryOrder(tag)
+        from wordpress import upload
+        upload(tag) # will be change
+        last = datetime.datetime.today()
+        took = last - first
+        print(f'{took.seconds}.{took.microseconds} saniye sürdü.')
+        os.chdir('..')
+tag = 'sword'
+tagList = list()
+with open('tags.txt','r') as file:
+    tags = file.read()
+    tags = tags.split(',')
+    for tag in tags:
+        tagList.append(tag)
+
+for actualTag in tagList:
+    run(actualTag)
 
