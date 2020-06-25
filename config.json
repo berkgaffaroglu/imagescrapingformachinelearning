@@ -1,0 +1,15 @@
+{
+  "ayarlar": [
+
+    {
+
+      "otomatikBeklemeDakika": 15,
+      "manuelBeklemeDakika": 0,
+      "defaultMod": "b",
+      "mirror": "false",
+      "categoryID": 2
+
+    }
+  
+  ]
+}

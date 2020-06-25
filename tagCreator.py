@@ -1,14 +1,41 @@
-i = -1
-with open('tags.txt', 'r') as file:
-    tags = file.read()
-    tagList = list()
-    for tag in tags.split(','):
-        tagList.append(tag)
-def tagChooser():
-    global i
-
-    i += 1
+import csv
+import string
+def getFinishedTagList():
     try:
-      return tagList[i]
-    except Exception:
-      return -1
+        with open('lastTag.txt','r') as file3:
+            finishedTagList = list()
+            tags = file3.read()
+            tagString = f'{tags}'
+            tagList = tagString.split(',')
+            for tag in tagList:
+                finishedTagList.append(tag)
+        return finishedTagList
+
+
+
+
+    
+    except Exception as e:
+        print(e)
+            
+def writeLastTag(tag):
+    with open('lastTag.txt','a') as file2:
+        file2.write(f'{tag},')
+
+def getTagList():
+    with open('keywords.csv','r') as file:
+        csvreader = csv.DictReader(file)
+        tagList = list()
+        for line in csvreader:
+            keyword = line['keyword'].split('ile ilgili')[0].strip()
+            keyword = string.capwords(keyword)
+            if keyword in getFinishedTagList():
+                pass
+            else:
+                tagList.append(keyword)
+            
+    return tagList
+
+
+
+
